@@ -123,6 +123,9 @@ class Game:
     def draw(self):
         self.screen.fill(Config.BLACK)
         self.all_sprites.draw(self.screen)
+        time = 20
+        textsurface= self.font.render(f'{time}', False, Config.RED)
+        self.screen.blit(textsurface,(32,32))
         pygame.display.update()
 
     def game_loop(self):
