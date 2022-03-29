@@ -91,6 +91,8 @@ class PlayerSprite(BaseSprite):
     def update(self):
         self.handle_movement()
         self.rect.y = self.rect.y - self.y_velocity
+        self.rect.x = self.rect.x - self.y_velocity
+
         self.check_collision()
         self.y_velocity = max(self.y_velocity - 0.5, Config.MAX_GRAVITY)
 
@@ -188,7 +190,7 @@ class Game:
         self.font = pygame.font.Font(None, 30)
         self.screen = pygame.display.set_mode( (Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT) ) 
         self.clock = pygame.time.Clock()
-        self.bg = pygame.image.load("res/bg-small.png")
+        self.bg = pygame.image.load("res/neu.png")
         self.bg_x = 0
 
     
