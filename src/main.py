@@ -172,6 +172,7 @@ class Game:
         self.clock = pygame.time.Clock()
         self.bg = pygame.image.load("res/bg-small.png")
         self.bg_x = 0
+        self.time = 20
 
     
     def load_map(self, mapfile):
@@ -209,8 +210,10 @@ class Game:
         self.screen.blit(tmp_bg, (second_x, 0))
 
         self.all_sprites.draw(self.screen)
-        time = 20
-        textsurface= self.font.render(f'{time}', False, Config.RED)
+        self.time = self.time - 1 /Config.FPS
+        textsurface= self.font.render(f'{self.time:.0f}', False, Config.BLACK)
+        if self.time< 0:
+            self.playing= False
         self.screen.blit(textsurface,(32,32))
         pygame.display.update()
 
