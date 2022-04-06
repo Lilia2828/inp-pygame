@@ -171,8 +171,14 @@ class Game:
         self.screen = pygame.display.set_mode( (Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT) ) 
         self.clock = pygame.time.Clock()
         self.bg = pygame.image.load("res/bg-small.png")
+        self.go = pygame.image.load("res/GAMEOVER.png")
         self.bg_x = 0
+        self.gameover= False
+        self.playing= False
+        self.waiting= False
         self.time = 20
+
+        
 
     
     def load_map(self, mapfile):
@@ -186,7 +192,7 @@ class Game:
 
     def new(self):
         self.playing = True
-
+        
         self.all_sprites = pygame.sprite.LayeredUpdates()
         self.ground = pygame.sprite.LayeredUpdates()
         self.players = pygame.sprite.LayeredUpdates()
@@ -197,6 +203,8 @@ class Game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.playing = False
+                self.gameover=True
+                self.waiting=False
 
     def update(self):
         self.all_sprites.update()
@@ -217,13 +225,23 @@ class Game:
         self.screen.blit(textsurface,(32,32))
         pygame.display.update()
 
+
+
+
     def game_loop(self):
         while self.playing:
             self.handle_events()
             self.update()
             self.draw()
             self.clock.tick(Config.FPS)
+        self.waiting = True
+        while self.waiting:
+            self.screen.blit(self.go, (0,0))
+            self.handle_events()
+            self.clock.tick(Config.FPS)
+            pygame.display.update()
 
+   
     
 def main():
     g = Game()
