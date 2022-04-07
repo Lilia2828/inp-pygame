@@ -116,7 +116,8 @@ class PlayerSprite(BaseSprite):
 
     def update_camera(self):
         x_c, y_c = self.game.screen.get_rect().center
-        x_diff = x_c - self.rect.centerx
+        offset = 5 * Config.TILE_SIZE  # Verschiebung der Spielfigur in x-Richtung 
+        x_diff = x_c + offset - self.rect.centerx
         y_diff = y_c - self.rect.centery
         for sprite in self.game.all_sprites:
             sprite.rect.x += x_diff
@@ -193,8 +194,15 @@ class Game:
         self.font = pygame.font.Font(None, 30)
         self.screen = pygame.display.set_mode( (Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT) ) 
         self.clock = pygame.time.Clock()
-        self.bg = pygame.image.load("res/Hintergrund ohne krokodil.png")
+        self.bg = load_and_scale_img("res/bg-small.png", (Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT))
+        self.go = load_and_scale_img("res/GAMEOVER.png", (Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT))
         self.bg_x = 0
+        self.gameover= False
+        self.playing= False
+        self.waiting= False
+        self.time = 20
+
+        
 
     
     def load_map(self, mapfile):
@@ -210,7 +218,7 @@ class Game:
 
     def new(self):
         self.playing = True
-
+        
         self.all_sprites = pygame.sprite.LayeredUpdates()
         self.ground = pygame.sprite.LayeredUpdates()
         self.players = pygame.sprite.LayeredUpdates()
@@ -218,10 +226,16 @@ class Game:
 
         self.load_map("maps/level-01.txt")
 
+        # Spielfigur in die Mitte des Bildschirms setzen
+        self.player.update_camera()
+        self.bg_x = 0
+
     def handle_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.playing = False
+                self.gameover=True
+                self.waiting=False
 
     def update(self):
         self.all_sprites.update()
@@ -235,10 +249,15 @@ class Game:
         self.screen.blit(tmp_bg, (second_x, 0))
 
         self.all_sprites.draw(self.screen)
-        time = 20
-        textsurface= self.font.render(f'{time}', False, Config.RED)
+        self.time = self.time - 1 /Config.FPS
+        textsurface= self.font.render(f'{self.time:.0f}', False, Config.BLACK)
+        if self.time< 0:
+            self.playing= False
         self.screen.blit(textsurface,(32,32))
         pygame.display.update()
+
+
+
 
     def game_loop(self):
         while self.playing:
@@ -246,7 +265,18 @@ class Game:
             self.update()
             self.draw()
             self.clock.tick(Config.FPS)
+        self.waiting = True
+        while self.waiting:
+            self.screen.blit(self.go, (0,0))
+            self.handle_events()
+            self.clock.tick(Config.FPS)
+            pygame.display.update()
 
+
+def load_and_scale_img(img_path, size):
+    tmp = pygame.image.load(img_path)
+    return pygame.transform.scale(tmp, size)
+   
     
 def main():
     g = Game()
