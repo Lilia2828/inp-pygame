@@ -16,15 +16,16 @@ class Spritesheet:
 
 class Config:
     TILE_SIZE = 32
-    WINDOW_WIDTH = TILE_SIZE * 20
-    WINDOW_HEIGHT = TILE_SIZE * 10
+    WINDOW_WIDTH = TILE_SIZE * 60
+    WINDOW_HEIGHT = TILE_SIZE * 33.75
     BLACK = (0, 0, 0)
     RED = (255, 0, 0)
     GREEN = (0, 255, 0)
     GREY = (128, 128, 128)
     WHITE = (255, 255, 255)
     FPS = 30
-    BG_SPEED = 1
+    MAX_GRAVITY = -3
+    BG_SPEED = 0
 
 
 
@@ -66,7 +67,10 @@ class PlayerSprite(BaseSprite):
             'spritesheet': Spritesheet("res/player.png"),
         }
         super().__init__(game, x, y, groups=game.players, layer=1, **img_data, **kwargs)
-        self.speed = 3
+        self.y_velocity = 0
+        self.x_velocity = 0
+        self.speed = 5
+        self.standing = False
         self.color = Config.RED
         self.anim_counter = 0
         self.animation_frames = [0, 32]
@@ -86,8 +90,16 @@ class PlayerSprite(BaseSprite):
     
     def update(self):
         self.handle_movement()
+        self.rect.y = self.rect.y - self.y_velocity
+        self.rect.x = self.rect.x - self.x_velocity
+
         self.check_collision()
 
+    def jump(self):
+        if self.standing:
+            self.y_velocity = self.jump_force
+            self.x_velocity = 5
+            self.standing = False
 
     def handle_movement(self):
         keys = pygame.key.get_pressed()
@@ -104,7 +116,8 @@ class PlayerSprite(BaseSprite):
 
     def update_camera(self):
         x_c, y_c = self.game.screen.get_rect().center
-        x_diff = x_c - self.rect.centerx
+        offset = 5 * Config.TILE_SIZE  # Verschiebung der Spielfigur in x-Richtung 
+        x_diff = x_c + offset - self.rect.centerx
         y_diff = y_c - self.rect.centery
         for sprite in self.game.all_sprites:
             sprite.rect.x += x_diff
@@ -140,6 +153,8 @@ class PlayerSprite(BaseSprite):
 
     def check_collision(self):
         hits = pygame.sprite.spritecollide(self, self.game.ground, False)
+        if hits: 
+            self.x_velocity = 0
         for hit in hits:
             if self.is_standing(hit):
                 self.rect.bottom = hit.rect.top
@@ -162,6 +177,15 @@ class GroundSprite(BaseSprite):
         super().__init__(game, x, y, groups=game.ground, layer=0)
         self.image.fill(Config.GREEN)
 
+class KrokodileSprite(BaseSprite):
+    def __init__(self, game, x, y):
+        img_data = {
+            "spritesheet": Spritesheet("res/kroko.png"),
+            "width": 666,
+            "height": 512,
+        }
+        super().__init__(game, x, y, groups=game.kroko, layer=1, **img_data)
+        
 
 class Game:
     def __init__(self):
@@ -170,8 +194,8 @@ class Game:
         self.font = pygame.font.Font(None, 30)
         self.screen = pygame.display.set_mode( (Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT) ) 
         self.clock = pygame.time.Clock()
-        self.bg = pygame.image.load("res/bg-small.png")
-        self.go = pygame.image.load("res/GAMEOVER.png")
+        self.bg = load_and_scale_img("res/bg-small.png", (Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT))
+        self.go = load_and_scale_img("res/GAMEOVER.png", (Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT))
         self.bg_x = 0
         self.gameover= False
         self.playing= False
@@ -189,6 +213,8 @@ class Game:
                         GroundSprite(self, x, y)
                     if c == "p":
                         self.player = PlayerSprite(self, x, y)
+                    if c == "k":
+                        KrokodileSprite(self, x, y)
 
     def new(self):
         self.playing = True
@@ -196,8 +222,13 @@ class Game:
         self.all_sprites = pygame.sprite.LayeredUpdates()
         self.ground = pygame.sprite.LayeredUpdates()
         self.players = pygame.sprite.LayeredUpdates()
+        self.kroko = pygame.sprite.LayeredUpdates()
 
         self.load_map("maps/level-01.txt")
+
+        # Spielfigur in die Mitte des Bildschirms setzen
+        self.player.update_camera()
+        self.bg_x = 0
 
     def handle_events(self):
         for event in pygame.event.get():
@@ -242,6 +273,10 @@ class Game:
             self.clock.tick(Config.FPS)
             pygame.display.update()
 
+
+def load_and_scale_img(img_path, size):
+    tmp = pygame.image.load(img_path)
+    return pygame.transform.scale(tmp, size)
    
     
 def main():
