@@ -16,8 +16,8 @@ class Spritesheet:
 
 class Config:
     TILE_SIZE = 32
-    WINDOW_WIDTH = TILE_SIZE * 60
-    WINDOW_HEIGHT = TILE_SIZE * 33.75
+    WINDOW_WIDTH = TILE_SIZE * 60 / 2
+    WINDOW_HEIGHT = TILE_SIZE * 33.75 / 2
     BLACK = (0, 0, 0)
     RED = (255, 0, 0)
     GREEN = (0, 255, 0)
@@ -64,7 +64,7 @@ class BaseSprite(pygame.sprite.Sprite):
 class PlayerSprite(BaseSprite):
     def __init__(self, game, x, y, **kwargs):
         img_data = {
-            'spritesheet': Spritesheet("res/player.png"),
+            'spritesheet': Spritesheet("res/Melone1.png"),
         }
         super().__init__(game, x, y, groups=game.players, layer=1, **img_data, **kwargs)
         self.y_velocity = 0
@@ -194,7 +194,7 @@ class Game:
         self.font = pygame.font.Font(None, 30)
         self.screen = pygame.display.set_mode( (Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT) ) 
         self.clock = pygame.time.Clock()
-        self.bg = load_and_scale_img("res/bg-small.png", (Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT))
+        self.bg = load_and_scale_img("res/Hintergrund ohne krokodil.png", (Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT))
         self.go = load_and_scale_img("res/GAMEOVER.png", (Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT))
         self.bg_x = 0
         self.gameover= False
