@@ -170,8 +170,8 @@ class Game:
         self.font = pygame.font.Font(None, 30)
         self.screen = pygame.display.set_mode( (Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT) ) 
         self.clock = pygame.time.Clock()
-        self.bg = pygame.image.load("res/bg-small.png")
-        self.go = pygame.image.load("res/GAMEOVER.png")
+        self.bg = load_and_scale_img("res/bg-small.png", (Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT))
+        self.go = load_and_scale_img("res/GAMEOVER.png", (Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT))
         self.bg_x = 0
         self.gameover= False
         self.playing= False
@@ -241,6 +241,10 @@ class Game:
             self.clock.tick(Config.FPS)
             pygame.display.update()
 
+
+def load_and_scale_img(img_path, size):
+    tmp = pygame.image.load(img_path)
+    return pygame.transform.scale(tmp, size)
    
     
 def main():
