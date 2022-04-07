@@ -235,6 +235,7 @@ class Game:
             self.draw()
             self.clock.tick(Config.FPS)
         self.waiting = True
+        self.screen = pygame.display.set_mode( (950,950) ) 
         while self.waiting:
             self.screen.blit(self.go, (0,0))
             self.handle_events()
