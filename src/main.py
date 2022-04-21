@@ -64,7 +64,7 @@ class BaseSprite(pygame.sprite.Sprite):
 class PlayerSprite(BaseSprite):
     def __init__(self, game, x, y, **kwargs):
         img_data = {
-            'spritesheet': Spritesheet("res/Melone1.png"),
+            'spritesheet': Spritesheet("res/zweim.png"),
         }
         super().__init__(game, x, y, groups=game.players, layer=1, **img_data, **kwargs)
         self.y_velocity = 0
@@ -120,6 +120,8 @@ class PlayerSprite(BaseSprite):
         x_diff = x_c + offset - self.rect.centerx
         y_diff = y_c - self.rect.centery
         for sprite in self.game.all_sprites:
+            if sprite in self.game.kroko:
+                break
             sprite.rect.x += x_diff
             sprite.rect.y += y_diff
         self.animate(x_diff)
@@ -194,7 +196,7 @@ class Game:
         self.font = pygame.font.Font(None, 30)
         self.screen = pygame.display.set_mode( (Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT) ) 
         self.clock = pygame.time.Clock()
-        self.bg = load_and_scale_img("res/Hintergrund ohne krokodil.png", (Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT))
+        self.bg = load_and_scale_img("res/Hintergrund mit krokodil.png", (Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT))
         self.go = load_and_scale_img("res/GAMEOVER.png", (Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT))
         self.bg_x = 0
         self.gameover= False
@@ -287,3 +289,4 @@ def main():
 
     pygame.quit()
     sys.exit()
+
