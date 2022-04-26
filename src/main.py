@@ -202,7 +202,7 @@ class Game:
         self.gameover= False
         self.playing= False
         self.waiting= False
-        self.time = 20
+        self.time = 120
 
         
 
