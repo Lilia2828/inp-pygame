@@ -1,6 +1,7 @@
 import pygame
 
 import sys
+from random import randint
 
 class Spritesheet:
     def __init__(self, file):
@@ -26,6 +27,9 @@ class Config:
     FPS = 30
     MAX_GRAVITY = -3
     BG_SPEED = 0
+
+
+
 
 
 
@@ -66,7 +70,7 @@ class PlayerSprite(BaseSprite):
         img_data = {
             'spritesheet': Spritesheet("res/zweim.png"),
         }
-        super().__init__(game, x, y, groups=game.players, layer=1, **img_data, **kwargs)
+        super().__init__(game, x, y, groups=game.players, layer=2, **img_data, **kwargs)
         self.y_velocity = 0
         self.x_velocity = 0
         self.speed = 5
@@ -90,16 +94,17 @@ class PlayerSprite(BaseSprite):
     
     def update(self):
         self.handle_movement()
+        
         self.rect.y = self.rect.y - self.y_velocity
         self.rect.x = self.rect.x - self.x_velocity
+        self.y_velocity = max(self.y_velocity - 0.5, -self.speed)
 
         self.check_collision()
 
     def jump(self):
-        if self.standing:
-            self.y_velocity = self.jump_force
-            self.x_velocity = 5
-            self.standing = False
+        self.y_velocity = 10
+        self.x_velocity = randint(5, 10)
+        self.standing = False
 
     def handle_movement(self):
         keys = pygame.key.get_pressed()
@@ -111,7 +116,11 @@ class PlayerSprite(BaseSprite):
             self.rect.y = self.rect.y - self.speed
         if keys[pygame.K_DOWN]:
             self.rect.y = self.rect.y + self.speed
+        if keys[pygame.K_SPACE]:
+            self.jump()
+        
         self.update_camera()
+
 
 
     def update_camera(self):
@@ -125,14 +134,14 @@ class PlayerSprite(BaseSprite):
             sprite.rect.x += x_diff
             sprite.rect.y += y_diff
         self.animate(x_diff)
-
+    
         # Shift Background
         self.game.bg_x += x_diff * Config.BG_SPEED
         if self.game.bg_x > Config.WINDOW_WIDTH:
             self.game.bg_x = -Config.WINDOW_WIDTH
         elif self.game.bg_x < -Config.WINDOW_WIDTH:
             self.game.bg_x = Config.WINDOW_WIDTH
-
+    
 
     def is_standing(self, hit):
         if abs(hit.rect.top - self.rect.bottom) > abs(self.speed):
@@ -154,6 +163,9 @@ class PlayerSprite(BaseSprite):
 
 
     def check_collision(self):
+        hits = pygame.sprite.spritecollide(self, self.game.kroko, False)
+        if hits:
+            print("Treffer")
         hits = pygame.sprite.spritecollide(self, self.game.ground, False)
         if hits: 
             self.x_velocity = 0
@@ -173,10 +185,11 @@ class PlayerSprite(BaseSprite):
             else:
                 self.rect.right = hit.rect.left
 
+    
 
 class GroundSprite(BaseSprite):
     def __init__(self, game, x, y):
-        super().__init__(game, x, y, groups=game.ground, layer=0)
+        super().__init__(game, x, y, groups=game.ground, layer=1)
         self.image.fill(Config.GREEN)
 
 class KrokodileSprite(BaseSprite):
@@ -186,7 +199,7 @@ class KrokodileSprite(BaseSprite):
             "width": 666,
             "height": 512,
         }
-        super().__init__(game, x, y, groups=game.kroko, layer=1, **img_data)
+        super().__init__(game, x, y, groups=game.kroko, layer=0, **img_data)
         
 
 class Game:
@@ -196,7 +209,7 @@ class Game:
         self.font = pygame.font.Font(None, 30)
         self.screen = pygame.display.set_mode( (Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT) ) 
         self.clock = pygame.time.Clock()
-        self.bg = load_and_scale_img("res/Hintergrund mit krokodil.png", (Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT))
+        self.bg = load_and_scale_img("res/Hintergrund ohne krokodil.png", (Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT))
         self.go = load_and_scale_img("res/GAMEOVER.png", (Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT))
         self.bg_x = 0
         self.gameover= False
