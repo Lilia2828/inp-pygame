@@ -195,9 +195,9 @@ class GroundSprite(BaseSprite):
 class KrokodileSprite(BaseSprite):
     def __init__(self, game, x, y):
         img_data = {
-            "spritesheet": Spritesheet("res/kroko.png"),
-            "width": 666,
-            "height": 512,
+            "spritesheet": Spritesheet("res/krokokl.png"),
+            "width": 172,
+            "height": 134,
         }
         super().__init__(game, x, y, groups=game.kroko, layer=0, **img_data)
         
