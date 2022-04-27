@@ -26,7 +26,7 @@ class Config:
     WHITE = (255, 255, 255)
     FPS = 30
     MAX_GRAVITY = -3
-    MAX_TIME = 30
+    MAX_TIME = 10
     BG_SPEED = 0
 
 
@@ -228,7 +228,7 @@ class Game:
         self.gameover= False
         self.playing= False
         self.waiting= False
-        self.time = 30
+        self.time = 10
 
         
 
@@ -308,12 +308,11 @@ def load_and_scale_img(img_path, size):
 
 
          
-   
-    
 def main():
     g = Game()
-    g.new()
 
+    g.new()
+  
     g.game_loop()
 
     pygame.quit()
