@@ -26,6 +26,7 @@ class Config:
     WHITE = (255, 255, 255)
     FPS = 30
     MAX_GRAVITY = -3
+    MAX_TIME = 30
     BG_SPEED = 0
 
 
@@ -100,6 +101,11 @@ class PlayerSprite(BaseSprite):
         self.y_velocity = max(self.y_velocity - 0.5, -self.speed)
 
         self.check_collision()
+        if self.rect.bottom >= Config.WINDOW_HEIGHT:
+            self.rect.x= 25*Config.TILE_SIZE
+            self.rect.y= 11*Config.TILE_SIZE
+        
+        
 
     def jump(self):
         self.y_velocity = 10
@@ -166,6 +172,9 @@ class PlayerSprite(BaseSprite):
         hits = pygame.sprite.spritecollide(self, self.game.kroko, False)
         if hits:
             print("Treffer")
+            self.game.time = Config.MAX_TIME
+            self.rect.x= 25*Config.TILE_SIZE
+            self.rect.y= 11*Config.TILE_SIZE
         hits = pygame.sprite.spritecollide(self, self.game.ground, False)
         if hits: 
             self.x_velocity = 0
@@ -189,8 +198,10 @@ class PlayerSprite(BaseSprite):
 
 class GroundSprite(BaseSprite):
     def __init__(self, game, x, y):
-        super().__init__(game, x, y, groups=game.ground, layer=1)
-        self.image.fill(Config.GREEN)
+        img_data = {
+            "spritesheet": Spritesheet("res/holz.png")
+        }
+        super().__init__(game, x, y, groups=game.ground, layer=1, **img_data)
 
 class KrokodileSprite(BaseSprite):
     def __init__(self, game, x, y):
@@ -215,7 +226,7 @@ class Game:
         self.gameover= False
         self.playing= False
         self.waiting= False
-        self.time = 120
+        self.time = 30
 
         
 
@@ -292,6 +303,9 @@ class Game:
 def load_and_scale_img(img_path, size):
     tmp = pygame.image.load(img_path)
     return pygame.transform.scale(tmp, size)
+
+
+         
    
     
 def main():
