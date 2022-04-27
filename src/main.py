@@ -104,7 +104,9 @@ class PlayerSprite(BaseSprite):
         if self.rect.bottom >= Config.WINDOW_HEIGHT:
             self.rect.x= 25*Config.TILE_SIZE
             self.rect.y= 11*Config.TILE_SIZE
-        
+        if self.rect.x <0:
+            self.rect.x= 25* Config.TILE_SIZE
+            self.rect.y= 11* Config.TILE_SIZE
         
 
     def jump(self):
